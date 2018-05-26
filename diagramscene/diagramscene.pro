@@ -4,8 +4,7 @@ HEADERS	    =   mainwindow.h \
 		diagramitem.h \
 		diagramscene.h \
 		arrow.h \
-		diagramtextitem.h \
-    singleton.h
+		diagramtextitem.h
 SOURCES	    =   mainwindow.cpp \
 		diagramitem.cpp \
 		main.cpp \

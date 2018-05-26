@@ -83,7 +83,6 @@ DiagramItem::DiagramItem(DiagramType diagramType, QMenu *contextMenu,
 
 
 
-
         case Step:
             myPolygon << QPointF(-100, -100) << QPointF(100, -100)
                       << QPointF(100, 100) << QPointF(-100, 100)
