@@ -65,23 +65,7 @@ DiagramItem::DiagramItem(DiagramType diagramType, QMenu *contextMenu,
     myContextMenu = contextMenu;
 
     QPainterPath path;
-    /*
-     *         case Conditional:
-            myPolygon << QPointF(-100, 0) << QPointF(0, 100)
-                      << QPointF(100, 0) << QPointF(0, -100)
-                      << QPointF(-100, 0);
-            break;
-     */
 
-    /*
-     *
-            path.moveTo(200, 50);
-            path.arcTo(150, 0, 50, 50, 0, 90);
-            path.arcTo(50, 0, 50, 50, 90, 90);
-            path.arcTo(50, 50, 50, 50, 180, 90);
-            path.arcTo(150, 50, 50, 50, 270, 90);
-            path.lineTo(200, 25);
-    */
 
 
     switch (myDiagramType) {
@@ -94,7 +78,7 @@ DiagramItem::DiagramItem(DiagramType diagramType, QMenu *contextMenu,
         path.lineTo(200, 25);
         myPolygon = path.toFillPolygon();
         break;
-    case Conditional:
+    case Door:
         myPolygon << QPointF(-50, 0) << QPointF(-50, 50)<< QPointF(-50, 100)
                   << QPointF(0, 100)<< QPointF(50, 100) << QPointF(50, -100)
                   << QPointF(-50,-100)<< QPointF(-50,0)
@@ -103,27 +87,27 @@ DiagramItem::DiagramItem(DiagramType diagramType, QMenu *contextMenu,
                   << QPointF(50,-10)<< QPointF(50, -100)
                   << QPointF(-50, -100)<< QPointF(-50, 0);
             break;
-
+    case Object:
+        myPolygon << QPointF(-10, -10) << QPointF(-10, 10)<< QPointF(10, 10)
+                  << QPointF(10, -10);
+            break;
 
         case Step:
             myPolygon << QPointF(-100, -100) << QPointF(100, -100)
                       << QPointF(100, 100) << QPointF(-100, 100)
                       << QPointF(-100, -100);
             break;
-        case Test:
-            qDebug ("message %d, says: %s","main","draw Test start");
-            myPolygon << QPointF(0, 0) << QPointF(100, -100);
+        case Window:
+        myPolygon << QPointF(-100, 0) << QPointF(-100, 20)
+                  << QPointF(100, 20) << QPointF(100, -20)
+                  << QPointF(-100, -20) << QPointF(-100, 0)
+                  << QPointF(100, 0)<< QPointF(100, 20)
+                  << QPointF(0, 20)<< QPointF(0, -20)
+                  << QPointF(-100, -20)<< QPointF(-100, 0);
         //Test 추
             break;
         default:
             //창문
-
-            myPolygon << QPointF(-100, 0) << QPointF(-100, 20)
-                      << QPointF(100, 20) << QPointF(100, -20)
-                      << QPointF(-100, -20) << QPointF(-100, 0)
-                      << QPointF(100, 0)<< QPointF(100, 20)
-                      << QPointF(0, 20)<< QPointF(0, -20)
-                      << QPointF(-100, -20)<< QPointF(-100, 0);
 
             break;
     }

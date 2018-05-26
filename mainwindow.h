@@ -142,7 +142,6 @@ private:
     QButtonGroup *pointerTypeGroup;
     QButtonGroup *backgroundButtonGroup;
     QButtonGroup *closeCheckGroup;
-
     QAction *lineAction;
 };
 //! [0]

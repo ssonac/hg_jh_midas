@@ -132,6 +132,14 @@ void MainWindow::buttonGroupClicked(int id)
     }
 }
 
+void MainWindow::objectGroupClicked(int id)
+{
+    qDebug ("message %s, says: %s","objectGroupClicked","start");
+    //scene->setItemType(DiagramItem::DiagramType(id));
+    scene->setMode(DiagramScene::Object);
+
+}
+
 void MainWindow::deleteItem()
 {
     foreach (QGraphicsItem *item, scene->selectedItems()) {
@@ -187,12 +195,7 @@ void MainWindow::pointerGroup2Clicked(int id)
     scene->setMode(DiagramScene::Mode(pointerTypeGroup2->checkedId()));
 }
 
-void MainWindow::objectGroupClicked(int id)
-{
-    qDebug ("message %s, says: %d","objectGtoubClicked",id);
 
-    scene->setMode(DiagramScene::Mode(objectGroup->checkedId()));
-}
 void MainWindow::bringToFront()
 {
     if (scene->selectedItems().isEmpty())
@@ -254,10 +257,9 @@ void MainWindow::createToolBox()
             this, SLOT(buttonGroupClicked(int)));
 
     QGridLayout *layout = new QGridLayout;
-    layout->addWidget(createCellWidget(tr("A"), DiagramItem::Conditional), 0, 0);
-    //layout->addWidget(createCellWidget(tr("B"), DiagramItem::StartEnd),1,0);
-    layout->addWidget(createCellWidget(tr("C"), DiagramItem::Io), 1, 0);
-
+    layout->addWidget(createCellWidget(tr("Door"), DiagramItem::Door), 0, 0);
+    layout->addWidget(createCellWidget(tr("Window"), DiagramItem::Window), 1, 0);
+    layout->addWidget(createCellWidget(tr("Object"), DiagramItem::Object), 2, 0);
     QGridLayout *space_layout = new QGridLayout;
 
     QToolButton *linePointerButton2 = new QToolButton;
@@ -278,11 +280,20 @@ void MainWindow::createToolBox()
     CButton->setCheckable(false);
     CButton->setIcon(QIcon(":/images/bold.png"));
     CButton->setIconSize(QSize(50, 50));
-/*
+//
+
+    QToolButton *OButton = new QToolButton;
+    OButton->setCheckable(true);
+    OButton->setIcon(QIcon(":/images/bold.png"));
+    OButton->setIconSize(QSize(50, 50));
+    //layout->addWidget(OButton,2,0);
     objectGroup = new QButtonGroup(this);
+    objectGroup->addButton(OButton, int(DiagramScene::Object));
+
+
     connect(objectGroup, SIGNAL(buttonClicked(int)),
             this, SLOT(objectGroupClicked(int)));
-*/
+
 
     QGridLayout *CLayout = new QGridLayout;
     CLayout->addWidget(CButton, 0, 1, Qt::AlignHCenter);
