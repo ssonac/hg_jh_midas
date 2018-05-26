@@ -56,11 +56,13 @@
 
 #include <vector>
 #include <utility>
-
+#include<math.h>
 using namespace std;
-vector < pair < int , int > > v;
 
-
+typedef struct{
+    int x1,y1,x2,y2,state;
+}node;
+vector < node  > v;
 //! [0]
 DiagramScene::DiagramScene(QMenu *itemMenu, QObject *parent)
     : QGraphicsScene(parent)
@@ -149,6 +151,11 @@ void DiagramScene::editorLostFocus(DiagramTextItem *item)
 //! [5]
 
 //! [6]
+
+int X1,X2,Y1,Y2;
+QLine Q1,Q2;
+int arr[1000][1000];  // -1 : 시작점과 끝점, 0: 빈거 1: 벽
+
 void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     int a,b;
@@ -175,28 +182,26 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             // pos_first = mouseEvent->scenePos().rx();
              //pos_second = mouseEvent->scenePos().rx();
              //qDebug ("message %d says: %d",a++," start");
-            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
-                                        mouseEvent->scenePos()));
+            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),mouseEvent->scenePos()));
             line->setPen(QPen(myLineColor, 2));
            // addItem(line);
             addItem(line);
             break;
 
-        case DrawLine:
+        case DrawLine://여기서 그림이 그려짐
             qDebug ("message i%s, says: %d","DrawLine",myMode);
 
             a = mouseEvent->scenePos().rx();
-            b = mouseEvent->scenePos().rx();
+            b = mouseEvent->scenePos().ry();
+            X1=mouseEvent->scenePos().rx(),Y1=mouseEvent->scenePos().ry();
+
             //x = make_pair(a,b)
-            v.push_back(make_pair(a,b));
-            qDebug("v size %d",v.size());
-            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
-                                        mouseEvent->scenePos()));
+           //line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),mouseEvent->scenePos()));
            // line->setPen(QPen(myLineColor, 2));
 
             //addItem(line);
-            line->setPen(QPen(Qt::blue, 3));
-           addItem(line);
+            //line->setPen(QPen(Qt::red, 3));
+            //addItem(line);
             break;
 
 //! [7] //! [8]
@@ -225,23 +230,161 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if ((myMode == InsertLine && line != 0)||(myMode == DrawLine && line != 0)) {
-        QLineF newLine(line->line().p1(), mouseEvent->scenePos());
-        line->setLine(newLine);
+       //QLineF newLine(line->line().p1(), mouseEvent->scenePos());
+       //  line->setLine(newLine);
     } else if (myMode == MoveItem) {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
 }
 //! [10]
 
+int paintArr(int x1,int y1,int x2,int y2, int state){//벽 색을 칠해주는 함
+  // qDebug("%d %d %d %d",x1,y1,x2,y2);
+    qDebug("p1");
+    int flag;
+    flag=1;
+    if(state==1){  // - line
+        for(int i=x1+1;i<x2;i++){
+            if(arr[y1][i]==1){
+               return 0;
+            }
+        }
+    }
+    else{
+       for(int i=y1+1;i<y2;i++){
+            if(arr[i][x1]==1){
+                return 0;
+            }
+        }
+
+    }
+    qDebug("p2");
+    if(state==1){
+        arr[y1][x1]=-1;
+        arr[y1][x2]=-1;
+        for(int i=x1+1;i<x2;i++){
+            arr[y1][i]=1;
+            //qDebug("%d",arr[y1][i]);
+
+        }
+    }
+    else{
+        arr[y1][x1]=-1;
+        arr[y2][x1]=-1;
+        for(int i=y1+1;i<y2;i++){
+            arr[i][x1]=1;
+        }
+    }
+    return 1;
+}
+int ulen(int x1,int y1, int x2,int y2){
+    return (int)sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+}
+
+void magnetic(int x1, int y1,int x2,int y2,int state, int offset){//좌표 두개와 마그넷 파워 설
+
+    int diff=1000000000;
+    int flag;
+    int tx,ty;
+    flag=0;
+    tx=ty=0;
+    for(int i=0;i<v.size();i++){
+        int len[4];
+        len[0]= ulen(x1,y1,v[i].x1,v[i].y1); //up
+        len[1]= ulen(x1,y1,v[i].x2,v[i].y2); //down
+        len[2]= ulen(x2,y2,v[i].x1,v[i].y1);
+        len[3]= ulen(x2,y2,v[i].x2,v[i].y2);
+        for(int j=0;j<4;j++){
+              qDebug("len%d: %d diff : %d",j,len[j],diff);
+                if(diff>len[j] && len[j]<offset){//
+                   diff=len[j];
+                   if((j%2)==0)  tx=v[i].x1,ty=v[i].y1;
+                   else tx=v[i].x2,ty=v[i].y2;
+                   flag=j+1;
+                }
+        }
+    }
+    qDebug("diff flag : %d %d",diff,flag);
+    if(state==1){
+        if(flag==1 ||flag==2){
+               X1=tx,Y1=ty;
+        }
+        else if(flag==3||flag==4){
+               X2=tx,Y2=ty;
+               Y1=ty;
+        }
+    }
+    if(state==2){
+        if(flag==1||flag==2){
+            X1=tx,Y1=ty;
+        }
+        else if(flag==3||flag==4){
+            X2=tx,Y2=ty;
+            X1=tx;
+        }
+    }
+   qDebug("mag x1y1x2y2 %d %d %d %d",(int)X1,(int)Y1,(int)X2,(int)Y1);
+}
 //! [11]
 void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    qDebug("hello size %d", v.size());
+    //qDebug("hello size %d", v.size());
 
-    for(int i = 0; i < v.size(); i++){
-        qDebug("%d",v.at(i));
+    //for(int i = 0; i < v.size(); i++){
+     //   qDebug("%d",v.at(i));
 
+    //}
+    X2=mouseEvent->scenePos().rx(),Y2=mouseEvent->scenePos().ry();//놓는좌표
+
+    int diffx = X2-X1;
+    int diffy = Y2-Y1;
+    if(diffx<0) diffx=-diffx;
+    if(diffy<0) diffy=-diffy;
+
+    if(diffx>diffy){ //  -line
+        if(X1>X2){ //x1<x2
+            int  temp;
+            temp= X2;
+            X2=X1;
+            X1=temp;
+        }
+        qDebug(" - no ma x1y1x2y2 %d %d %d %d",X1,Y1,X2,Y1);
+        magnetic(X1,Y1,X2,Y1,1,100);
+
+        if(paintArr(X1,Y1,X2,Y1,1)==1){
+            line = new QGraphicsLineItem(QLineF(X1,Y1,X2,Y1));
+            line->setPen(QPen(Qt::black, 2));
+            addItem(line);
+            v.push_back({X1,Y1,X2,Y1,1});
+            qDebug("why?");
+        }
     }
+    else{  // | line
+        if(Y1>Y2){  //y1<y2
+            int  temp;
+            temp= Y2;
+            Y2=Y1;
+            Y1=temp;
+        }
+        qDebug(" | no ma x1,y1,x2,y2 %d %d %d %d",X1,Y1,X1,Y2);
+       magnetic(X1,Y1,X1,Y2,2,100);
+
+        if(paintArr(X1,Y1,X1,Y2,0)==1){
+            line = new QGraphicsLineItem(QLineF(X1,Y1,X1,Y2));
+            line->setPen(QPen(Qt::black, 2));
+            addItem(line);
+            v.push_back({X1,Y1,X1,Y2,2});//y1이 더 작은데 위에있음
+            qDebug("why?");
+        }
+    }
+    //qDebug("%d %d %d %d",(int)X1,(int)Y1,(int)X2,(int)Y2);
+    qDebug("v.size: %d",v.size());
+
+  //  for(int i=0;i<v.size();i++){
+  //      qDebug("%d %d %d %d",v[i].x1,v[i].y1,v[i].x2,v[i].y2);
+  //  }
+
+
 
 
     if (line == 0 && myMode == InsertLine) {

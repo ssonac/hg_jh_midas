@@ -61,7 +61,8 @@ int main(int argv, char *args[])
 
     QApplication app(argv, args);
     MainWindow mainWindow;
-    mainWindow.setGeometry(100, 100, 1280, 720);
+
+    mainWindow.setGeometry(100, 100, 800,800);
     //화면크기 조
     mainWindow.show();
 

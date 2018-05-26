@@ -71,7 +71,7 @@ MainWindow::MainWindow()
 
     scene = new DiagramScene(itemMenu, this);
     //scene이 작업공간
-    scene->setSceneRect(QRectF(0, 0, 5000, 5000));
+    scene->setSceneRect(QRectF(0, 0, 800,800));
 
     connect(scene, SIGNAL(itemInserted(DiagramItem*)),
             this, SLOT(itemInserted(DiagramItem*)));
