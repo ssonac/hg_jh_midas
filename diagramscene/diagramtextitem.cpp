@@ -51,6 +51,7 @@
 #include "diagramtextitem.h"
 #include "diagramscene.h"
 
+
 //! [0]
 DiagramTextItem::DiagramTextItem(QGraphicsItem *parent)
     : QGraphicsTextItem(parent)

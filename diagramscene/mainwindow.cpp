@@ -55,12 +55,14 @@
 #include "mainwindow.h"
 #include <QtWidgets>
 
+
 using namespace std;
 const int InsertTextButton = 10;
 
 //! [0]
 MainWindow::MainWindow()
 {
+
     qDebug ("message %d, says: %s","MainWindow","constructor");
     createActions();
     //bact
@@ -682,7 +684,7 @@ QIcon MainWindow::createColorToolButtonIcon(const QString &imageFile, QColor col
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
     QPixmap image(imageFile);
-    // Draw icon centred horizontally on button.
+    //Draw icon centred horizontally on button.
     QRect target(4, 0, 42, 43);
     QRect source(0, 0, 42, 43);
     painter.fillRect(QRect(0, 60, 50, 80), color);

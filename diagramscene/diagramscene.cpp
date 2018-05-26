@@ -54,6 +54,13 @@
 #include <QTextCursor>
 #include <QGraphicsSceneMouseEvent>
 
+#include <vector>
+#include <utility>
+
+using namespace std;
+vector < pair < int , int > > v;
+
+
 //! [0]
 DiagramScene::DiagramScene(QMenu *itemMenu, QObject *parent)
     : QGraphicsScene(parent)
@@ -144,8 +151,9 @@ void DiagramScene::editorLostFocus(DiagramTextItem *item)
 //! [6]
 void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    int a = 0;
-    int b = 0;
+    int a,b;
+    //pair<int,int> x;
+    //qDebug("ajflasdjf%d",a+);
     if (mouseEvent->button() != Qt::LeftButton)
         return;
     qDebug ("message %s, says: %s","diagramscene mousePress Event"," start");
@@ -164,9 +172,9 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //! [6] //! [7]
         case InsertLine:
             qDebug ("message %s, says: %d","InsertLine",myMode);
-           // pos_first = mouseEvent->scenePos().rx();
-            //pos_second = mouseEvent->scenePos().rx();
-            qDebug ("message %d says: %s",a," start");
+            // pos_first = mouseEvent->scenePos().rx();
+             //pos_second = mouseEvent->scenePos().rx();
+             //qDebug ("message %d says: %d",a++," start");
             line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
                                         mouseEvent->scenePos()));
             line->setPen(QPen(myLineColor, 2));
@@ -175,13 +183,20 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             break;
 
         case DrawLine:
-            qDebug ("message %s, says: %d","DrawLine",myMode);
-            //a = mouseEvent->scenePos().rx();
-            //b = mouseEvent->scenePos().rx();
+            qDebug ("message i%s, says: %d","DrawLine",myMode);
+
+            a = mouseEvent->scenePos().rx();
+            b = mouseEvent->scenePos().rx();
+            //x = make_pair(a,b)
+            v.push_back(make_pair(a,b));
+            qDebug("v size %d",v.size());
             line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
                                         mouseEvent->scenePos()));
-            line->setPen(QPen(myLineColor, 2));
-            addItem(line);
+           // line->setPen(QPen(myLineColor, 2));
+
+            //addItem(line);
+            line->setPen(QPen(Qt::blue, 3));
+           addItem(line);
             break;
 
 //! [7] //! [8]
@@ -209,7 +224,7 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //! [10]
 void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if (myMode == InsertLine && line != 0) {
+    if ((myMode == InsertLine && line != 0)||(myMode == DrawLine && line != 0)) {
         QLineF newLine(line->line().p1(), mouseEvent->scenePos());
         line->setLine(newLine);
     } else if (myMode == MoveItem) {
@@ -221,6 +236,14 @@ void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 //! [11]
 void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    qDebug("hello size %d", v.size());
+
+    for(int i = 0; i < v.size(); i++){
+        qDebug("%d",v.at(i));
+
+    }
+
+
     if (line == 0 && myMode == InsertLine) {
     //if (line != 0 && myMode == InsertLine) {
         QList<QGraphicsItem *> startItems = items(line->line().p1());

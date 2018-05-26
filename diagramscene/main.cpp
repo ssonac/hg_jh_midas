@@ -49,13 +49,14 @@
 ****************************************************************************/
 
 #include "mainwindow.h"
-
 #include <QApplication>
 
 using namespace std;
 int main(int argv, char *args[])
 {
+
     qDebug ("message %d, says: %s","main","prog start");
+  //qDebug ("message %d, says: %d","main",a[0]);
     Q_INIT_RESOURCE(diagramscene);
 
     QApplication app(argv, args);
