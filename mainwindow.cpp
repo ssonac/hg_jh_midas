@@ -75,10 +75,6 @@ MainWindow::MainWindow()
 
     connect(scene, SIGNAL(itemInserted(DiagramItem*)),
             this, SLOT(itemInserted(DiagramItem*)));
-    connect(scene, SIGNAL(textInserted(QGraphicsTextItem*)),
-            this, SLOT(textInserted(QGraphicsTextItem*)));
-    connect(scene, SIGNAL(itemSelected(QGraphicsItem*)),
-            this, SLOT(itemSelected(QGraphicsItem*)));
 
     //아이템 들어오는것, 텍스트넣는거, 아이템 고르는거 신호 연결
 
@@ -171,7 +167,12 @@ void MainWindow::savetoIMG()
     image.save("output.png");
 }
 
+void MainWindow::closeCheckGroupClicked(int id)
+{
+    qDebug ("message %s, says: %d","closeCheckGroupClicked",id);
 
+
+}
 void MainWindow::pointerGroupClicked(int id)
 {
     qDebug ("message %s, says: %d","pointerGroupClicked",id);
@@ -273,23 +274,24 @@ void MainWindow::createToolBox()
     wallLayout->addWidget(linePointerButton2, 0, 0, Qt::AlignHCenter);
     wallLayout->addWidget(new QLabel(tr("darw Wall")), 1, 0, Qt::AlignCenter);
 
-
-
-    QToolButton *WindowButton = new QToolButton;
-    WindowButton->setCheckable(true);
-    WindowButton->setIcon(QIcon(":/images/bold.png"));
-    WindowButton->setIconSize(QSize(50, 50));
-
+    QToolButton *CButton = new QToolButton;
+    CButton->setCheckable(false);
+    CButton->setIcon(QIcon(":/images/bold.png"));
+    CButton->setIconSize(QSize(50, 50));
+/*
     objectGroup = new QButtonGroup(this);
     connect(objectGroup, SIGNAL(buttonClicked(int)),
             this, SLOT(objectGroupClicked(int)));
+*/
 
-    QGridLayout *windowLayout = new QGridLayout;
-    windowLayout->addWidget(WindowButton, 0, 1, Qt::AlignHCenter);
-    windowLayout->addWidget(new QLabel(tr("Window")), 2, 0, Qt::AlignCenter);
+    QGridLayout *CLayout = new QGridLayout;
+    CLayout->addWidget(CButton, 0, 1, Qt::AlignHCenter);
+    CLayout->addWidget(new QLabel(tr("closed")), 2, 0, Qt::AlignCenter);
 
 
-
+    closeCheckGroup = new QButtonGroup(this);
+    connect(closeCheckGroup, SIGNAL(buttonClicked(QAbstractButton*)),
+            this, SLOT(closeCheckGroupClicked(QAbstractButton*)));
 
     layout->setRowStretch(3, 10);
     layout->setColumnStretch(2, 10);
@@ -297,14 +299,12 @@ void MainWindow::createToolBox()
     space_layout->setRowStretch(3, 10);
     space_layout->setColumnStretch(2, 10);
     space_layout->addWidget(linePointerButton2, 0, 0);
-    space_layout->addWidget(WindowButton, 1, 0);
+    space_layout->addWidget(CButton, 1, 0);
     QWidget *itemWidget = new QWidget;
     itemWidget->setLayout(layout);
 
     QWidget *spaceWidget = new QWidget;
     spaceWidget->setLayout(space_layout);
-
-
 
     backgroundButtonGroup = new QButtonGroup(this);
     connect(backgroundButtonGroup, SIGNAL(buttonClicked(QAbstractButton*)),
@@ -441,7 +441,6 @@ QWidget *MainWindow::createBackgroundCellWidget(const QString &text, const QStri
 
 QWidget *MainWindow::createCellWidget(const QString &text, DiagramItem::DiagramType type)
 {
-
     DiagramItem item(type, itemMenu);
     QIcon icon(item.image());
 

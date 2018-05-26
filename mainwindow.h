@@ -87,6 +87,7 @@ private slots:
     void pointerGroupClicked(int id);
     void pointerGroup2Clicked(int id);
     void objectGroupClicked(int id);
+    void closeCheckGroupClicked(int id);
     void bringToFront();
     void sendToBack();
     void itemInserted(DiagramItem *item);
@@ -140,7 +141,7 @@ private:
     QButtonGroup *pointerTypeGroup2;
     QButtonGroup *pointerTypeGroup;
     QButtonGroup *backgroundButtonGroup;
-
+    QButtonGroup *closeCheckGroup;
 
     QAction *lineAction;
 };

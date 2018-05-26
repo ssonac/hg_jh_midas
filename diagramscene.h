@@ -84,6 +84,7 @@ public:
     void setItemColor(const QColor &color);
     void setFont(const QFont &font);
 
+
 public slots:
     void setMode(Mode mode);
     void setItemType(DiagramItem::DiagramType type);
