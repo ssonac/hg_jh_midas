@@ -57,12 +57,16 @@
 #include <vector>
 #include <utility>
 #include<math.h>
+#include<queue>
+#include<iostream>
+
 using namespace std;
 
 typedef struct{
     int x1,y1,x2,y2,state;
 }node;
 vector < node  > v;
+
 //! [0]
 DiagramScene::DiagramScene(QMenu *itemMenu, QObject *parent)
     : QGraphicsScene(parent)
@@ -154,19 +158,13 @@ void DiagramScene::editorLostFocus(DiagramTextItem *item)
 
 int X1,X2,Y1,Y2;
 QLine Q1,Q2;
-int arr[1000][1000];  // -1 : 시작점과 끝점, 0: 빈거 1: 벽
-
+int arr[1030][1030];  // -1 : 시작점과 끝점, 0: 빈거 1: 벽
 void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    int a,b;
-    //pair<int,int> x;
-    //qDebug("ajflasdjf%d",a+);
     if (mouseEvent->button() != Qt::LeftButton)
-        return;
-    qDebug ("message %s, says: %s","diagramscene mousePress Event"," start");
+           return;
 
     DiagramItem *item;
-   // qDebug ("message %s, says: %s","My mode",myMode);
     switch (myMode) {
         case InsertItem:
             qDebug ("message %s, says: %d","Insert Item",myMode);
@@ -182,26 +180,15 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
             // pos_first = mouseEvent->scenePos().rx();
              //pos_second = mouseEvent->scenePos().rx();
              //qDebug ("message %d says: %d",a++," start");
-            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),mouseEvent->scenePos()));
+            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
+                                        mouseEvent->scenePos()));
             line->setPen(QPen(myLineColor, 2));
            // addItem(line);
             addItem(line);
             break;
 
-        case DrawLine://여기서 그림이 그려짐
-            qDebug ("message i%s, says: %d","DrawLine",myMode);
-
-            a = mouseEvent->scenePos().rx();
-            b = mouseEvent->scenePos().ry();
+        case DrawLine:
             X1=mouseEvent->scenePos().rx(),Y1=mouseEvent->scenePos().ry();
-
-            //x = make_pair(a,b)
-           //line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),mouseEvent->scenePos()));
-           // line->setPen(QPen(myLineColor, 2));
-
-            //addItem(line);
-            //line->setPen(QPen(Qt::red, 3));
-            //addItem(line);
             break;
 
 //! [7] //! [8]
@@ -230,8 +217,8 @@ void DiagramScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void DiagramScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
     if ((myMode == InsertLine && line != 0)||(myMode == DrawLine && line != 0)) {
-       //QLineF newLine(line->line().p1(), mouseEvent->scenePos());
-       //  line->setLine(newLine);
+      //  QLineF newLine(line->line().p1(), mouseEvent->scenePos());
+      //  line->setLine(newLine);
     } else if (myMode == MoveItem) {
         QGraphicsScene::mouseMoveEvent(mouseEvent);
     }
@@ -304,7 +291,7 @@ void magnetic(int x1, int y1,int x2,int y2,int state, int offset){//좌표 두�
                 }
         }
     }
-    qDebug("diff flag : %d %d",diff,flag);
+   // qDebug("diff flag : %d %d",diff,flag);
     if(state==1){
         if(flag==1 ||flag==2){
                X1=tx,Y1=ty;
@@ -323,82 +310,111 @@ void magnetic(int x1, int y1,int x2,int y2,int state, int offset){//좌표 두�
             X1=tx;
         }
     }
-   qDebug("mag x1y1x2y2 %d %d %d %d",(int)X1,(int)Y1,(int)X2,(int)Y1);
+  // qDebug("mag x1y1x2y2 %d %d %d %d",(int)X1,(int)Y1,(int)X2,(int)Y1);
+}
+int dr[4]={1,-1,0,0};
+int dc[4]={0,0,1,-1};
+int check[1020][1020];
+void bfs(int r, int c){
+
+    queue< pair<int , int> > q;
+    q.push({r,c});
+    check[r][c]=1;
+
+    while(!q.empty()){
+        int hr,hc;
+        hr= q.front().first;
+        hc = q.front().second;
+        q.pop();
+
+        for(int k=0;k<4;k++){
+            int nr,nc;
+            nr = hr + dr[k], nc = hc+dc[k];
+            if(0<=nr && nr<1000&&0<=nc&&nc<1000&&check[nr][nc]==0 && arr[nr][nc]==0){
+                q.push({hr,hc});
+                check[nr][nc]=1;
+            }
+        }
+    }
+}
+
+int checkclose(){
+   for(int i=0;i<1020;i++)for(int j=0;j<1020;j++) check[i][j]=0;
+
+   int cnt=0;
+   for(int j=0;j<1000;j++){
+       for(int i=0;i<1000;i++){
+           if(check[i][j]==0 && arr[i][j]==0){
+                bfs(i,j);
+                cnt++;
+           }
+          if(arr[i][j]==1&&check[i+1][j]==1)
+               return 0;
+       }
+   }
+   qDebug("cnt %d",cnt);
+   return 1;
 }
 //! [11]
 void DiagramScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    //qDebug("hello size %d", v.size());
+     X2=mouseEvent->scenePos().rx(),Y2=mouseEvent->scenePos().ry();//놓는좌표
+     int diffx = X2-X1;
+     int diffy = Y2-Y1;
+     if(diffx<0) diffx=-diffx;
+     if(diffy<0) diffy=-diffy;
+     if(diffx>diffy){ //  -line
+            if(X1>X2){ //x1<x2
+                int  temp;
+                temp= X2;
+                X2=X1;
+                X1=temp;
+            }
+            qDebug(" - no ma x1y1x2y2 %d %d %d %d",X1,Y1,X2,Y1);
+            magnetic(X1,Y1,X2,Y1,1,150);
 
-    //for(int i = 0; i < v.size(); i++){
-     //   qDebug("%d",v.at(i));
-
-    //}
-    X2=mouseEvent->scenePos().rx(),Y2=mouseEvent->scenePos().ry();//놓는좌표
-
-    int diffx = X2-X1;
-    int diffy = Y2-Y1;
-    if(diffx<0) diffx=-diffx;
-    if(diffy<0) diffy=-diffy;
-
-    if(diffx>diffy){ //  -line
-        if(X1>X2){ //x1<x2
-            int  temp;
-            temp= X2;
-            X2=X1;
-            X1=temp;
+            if(paintArr(X1,Y1,X2,Y1,1)==1){
+                line = new QGraphicsLineItem(QLineF(X1,Y1,X2,Y1));
+                line->setPen(QPen(Qt::black, 2));
+                addItem(line);
+                v.push_back({X1,Y1,X2,Y1,1});
+                qDebug("why?");
+            }
         }
-        qDebug(" - no ma x1y1x2y2 %d %d %d %d",X1,Y1,X2,Y1);
-        magnetic(X1,Y1,X2,Y1,1,100);
+     else{  // | line
+            if(Y1>Y2){  //y1<y2
+                int  temp;
+                temp= Y2;
+                Y2=Y1;
+                Y1=temp;
+            }
+            qDebug(" | no ma x1,y1,x2,y2 %d %d %d %d",X1,Y1,X1,Y2);
+           magnetic(X1,Y1,X1,Y2,2,100);
 
-        if(paintArr(X1,Y1,X2,Y1,1)==1){
-            line = new QGraphicsLineItem(QLineF(X1,Y1,X2,Y1));
-            line->setPen(QPen(Qt::black, 2));
-            addItem(line);
-            v.push_back({X1,Y1,X2,Y1,1});
-            qDebug("why?");
+            if(paintArr(X1,Y1,X1,Y2,0)==1){
+                line = new QGraphicsLineItem(QLineF(X1,Y1,X1,Y2));
+                line->setPen(QPen(Qt::black, 2));
+                addItem(line);
+                v.push_back({X1,Y1,X1,Y2,2});//y1이 더 작은데 위에있음
+                qDebug("why?");
+            }
         }
-    }
-    else{  // | line
-        if(Y1>Y2){  //y1<y2
-            int  temp;
-            temp= Y2;
-            Y2=Y1;
-            Y1=temp;
-        }
-        qDebug(" | no ma x1,y1,x2,y2 %d %d %d %d",X1,Y1,X1,Y2);
-       magnetic(X1,Y1,X1,Y2,2,100);
-
-        if(paintArr(X1,Y1,X1,Y2,0)==1){
-            line = new QGraphicsLineItem(QLineF(X1,Y1,X1,Y2));
-            line->setPen(QPen(Qt::black, 2));
-            addItem(line);
-            v.push_back({X1,Y1,X1,Y2,2});//y1이 더 작은데 위에있음
-            qDebug("why?");
-        }
-    }
-    //qDebug("%d %d %d %d",(int)X1,(int)Y1,(int)X2,(int)Y2);
-    qDebug("v.size: %d",v.size());
-
-  //  for(int i=0;i<v.size();i++){
-  //      qDebug("%d %d %d %d",v[i].x1,v[i].y1,v[i].x2,v[i].y2);
-  //  }
-
-
-
+     int closed;
+        closed= checkclose();
+        qDebug("closed %d",closed);
 
     if (line == 0 && myMode == InsertLine) {
     //if (line != 0 && myMode == InsertLine) {
         QList<QGraphicsItem *> startItems = items(line->line().p1());
         if (startItems.count() && startItems.first() == line)
             startItems.removeFirst();
+
         QList<QGraphicsItem *> endItems = items(line->line().p2());
         if (endItems.count() && endItems.first() == line)
             endItems.removeFirst();
 
         removeItem(line);
         delete line;
-//! [11] //! [12]
 
         if (startItems.count() > 0 && endItems.count() > 0 &&
             startItems.first()->type() == DiagramItem::Type &&

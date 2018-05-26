@@ -86,23 +86,15 @@ private slots:
     void deleteItem();
     void pointerGroupClicked(int id);
     void pointerGroup2Clicked(int id);
+    void objectGroupClicked(int id);
     void bringToFront();
     void sendToBack();
     void itemInserted(DiagramItem *item);
-    void textInserted(QGraphicsTextItem *item);
-    void currentFontChanged(const QFont &font);
-    void fontSizeChanged(const QString &size);
-    void sceneScaleChanged(const QString &scale);
-    void textColorChanged();
-    void itemColorChanged();
-    void lineColorChanged();
-    void textButtonTriggered();
-    void fillButtonTriggered();
-    void lineButtonTriggered();
-    void handleFontChange();
-    void itemSelected(QGraphicsItem *item);
-    void about();
 
+    void sceneScaleChanged(const QString &scale);
+
+    void about();
+    void savetoIMG();
 private:
     void createToolBox();
     void createActions();
@@ -120,6 +112,8 @@ private:
     DiagramScene *scene;
     QGraphicsView *view;
 
+
+    QAction *saveAction;
     QAction *exitAction;
     QAction *addAction;
     QAction *deleteAction;
@@ -132,32 +126,22 @@ private:
     QMenu *itemMenu;
     QMenu *aboutMenu;
 
-    QToolBar *textToolBar;
+
     QToolBar *editToolBar;
     QToolBar *colorToolBar;
     QToolBar *pointerToolbar;
 
     QComboBox *sceneScaleCombo;
-    QComboBox *itemColorCombo;
-    QComboBox *textColorCombo;
-    QComboBox *fontSizeCombo;
-    QFontComboBox *fontCombo;
 
     QToolBox *toolBox;
 
     QButtonGroup *buttonGroup;
+    QButtonGroup *objectGroup;
     QButtonGroup *pointerTypeGroup2;
     QButtonGroup *pointerTypeGroup;
     QButtonGroup *backgroundButtonGroup;
 
-    QToolButton *fontColorToolButton;
-    QToolButton *fillColorToolButton;
-    QToolButton *lineColorToolButton;
-    QAction *boldAction;
-    QAction *underlineAction;
-    QAction *italicAction;
-    QAction *textAction;
-    QAction *fillAction;
+
     QAction *lineAction;
 };
 //! [0]
